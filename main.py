@@ -7,7 +7,23 @@ import math
 
 app = FastAPI(title="AstroInsight Ephemeris API", version="3.0")
 
-swe.set_ephe_path('')  # usa path interno di pyswisseph
+import os, urllib.request
+
+EPHE_DIR = '/tmp/ephe'
+os.makedirs(EPHE_DIR, exist_ok=True)
+
+EPHE_FILES = ['seas_18.se1', 'semo_18.se1', 'sepl_18.se1']
+EPHE_BASE = 'https://raw.githubusercontent.com/aloistr/swisseph/master/ephe/'
+
+for f in EPHE_FILES:
+    path = os.path.join(EPHE_DIR, f)
+    if not os.path.exists(path):
+        try:
+            urllib.request.urlretrieve(EPHE_BASE + f, path)
+        except Exception as e:
+            print(f'Warning: could not download {f}: {e}')
+
+swe.set_ephe_path(EPHE_DIR)
 
 # ─── COSTANTI ────────────────────────────────────────────────────────────────
 
